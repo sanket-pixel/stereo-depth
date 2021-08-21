@@ -1,12 +1,24 @@
 import torch
 from torch import nn
 
+import configparser
+
+config = configparser.ConfigParser()
+config.read("configs/sceneflow.config")
+
+scale_factor = config.getint("DisparityRegression", "scale_factor")
+mode = config.get("DisparityRegression", "mode")
+max_disparity = config.getint("Data", "max_disparity")
+
 class SoftRegression(nn.Module):
-    def __init__(self,scale_factor,mode='bilinear', max_disparity=192):
+    def __init__(self):
         super(SoftRegression, self).__init__()
-        self.upsample = nn.Upsample(scale_factor=4,mode=mode)
+        self.scale_factor = scale_factor
+        self.mode = mode
+        self.max_disparity = max_disparity
+        self.upsample = nn.Upsample(scale_factor=self.scale_factor,mode=self.mode)
         self.channelwise_softmax = nn.Softmax(dim=1)
-        self.disparity_values = torch.arange(max_disparity).float()
+        self.disparity_values = torch.arange(self.max_disparity).float()
 
 
     def forward(self,x):

@@ -1,20 +1,27 @@
 from torch import nn
 import torch
+import configparser
+from . import siamese, joined_processing, disparity_regression, residual_block, residual_block_3d
+
+config = configparser.ConfigParser()
+config.read("configs/sceneflow.config")
+
 
 class StereoDepth(nn.Module):
-    def __init__(self, siamese, cost_volume, disparity_regression):
+    def __init__(self):
         super(StereoDepth, self).__init__()
-        self.siamese = siamese
-        self.cost_volume = cost_volume
-        self.disparity_regression = disparity_regression
+        self.block = residual_block.ResidualBlock
+        self.block3d = residual_block_3d.ResidualBlock3D
+        self.siamese = siamese.Siamese(block=self.block)
+        self.cost_volume = joined_processing.CostVolume(block3d=self.block3d)
+        self.disparity_regression = disparity_regression.SoftRegression()
 
-
-    def forward(self,x):
+    def forward(self, x):
         left_image = x[0].unsqueeze(0)
         right_image = x[1].unsqueeze(0)
         gt_disparity = x[2]
         left_feature = self.siamese(left_image)
         right_feature = self.siamese(right_image)
-        cost = self.cost_volume((left_feature,right_feature))
+        cost = self.cost_volume((left_feature, right_feature))
         predicted_disparity = self.disparity_regression(cost)
-        return predicted_disparity,gt_disparity
+        return predicted_disparity, gt_disparity

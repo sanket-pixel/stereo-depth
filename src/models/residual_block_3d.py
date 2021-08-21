@@ -1,5 +1,6 @@
 from torch import nn
 
+
 class ResidualBlock3D(nn.Module):
 
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding, change_dim=None):
@@ -17,8 +18,7 @@ class ResidualBlock3D(nn.Module):
         self.conv2 = nn.Conv3d(self.out_channels, self.out_channels, kernel_size, stride=stride, padding=padding)
         self.bn2 = nn.BatchNorm3d(out_channels)
 
-        self.conv1x1x1 = nn.Conv3d(in_channels,out_channels, kernel_size=1, stride=1, padding=0)
-
+        self.conv1x1x1 = nn.Conv3d(in_channels, out_channels, kernel_size=1, stride=1, padding=0)
 
     def forward(self, x):
         identity = x
@@ -37,4 +37,3 @@ class ResidualBlock3D(nn.Module):
         x += identity
         x = self.relu(x)
         return x
-
