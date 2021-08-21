@@ -11,7 +11,7 @@ class ResidualBlock(nn.Module):
 
         self.conv1 = nn.Conv2d(channels, channels, kernel_size, stride=stride, padding=padding)
         self.bn1 = nn.BatchNorm2d(channels)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU()
 
         self.conv2 = nn.Conv2d(channels, channels, kernel_size, stride=stride, padding=padding)
         self.bn2 = nn.BatchNorm2d(channels)

@@ -13,7 +13,7 @@ class ResidualBlock3D(nn.Module):
 
         self.conv1 = nn.Conv3d(self.in_channels, self.out_channels, kernel_size, stride=stride, padding=padding)
         self.bn1 = nn.BatchNorm3d(out_channels)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU()
 
         self.conv2 = nn.Conv3d(self.out_channels, self.out_channels, kernel_size, stride=stride, padding=padding)
         self.bn2 = nn.BatchNorm3d(out_channels)

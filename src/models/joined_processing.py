@@ -2,6 +2,8 @@ import torch
 from torch import nn
 import configparser
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 config = configparser.ConfigParser()
 config.read("configs/sceneflow.config")
 
@@ -43,7 +45,7 @@ class CostVolume(nn.Module):
     def features_to_cost_volume(self, left_feat, right_feat):
 
         cost = torch.Tensor(self.batch_size, self.in_channels * 2, self.max_disparity // 4, self.height // 4,
-                            self.width // 4)
+                            self.width // 4).to(device)
         for i in range(self.max_disparity // 4):
             if i == 0:
                 cost[:, :self.in_channels, i, :, :] = left_feat

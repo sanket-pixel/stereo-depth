@@ -16,12 +16,9 @@ class StereoDepth(nn.Module):
         self.cost_volume = joined_processing.CostVolume(block3d=self.block3d)
         self.disparity_regression = disparity_regression.SoftRegression()
 
-    def forward(self, x):
-        left_image = x[0].unsqueeze(0)
-        right_image = x[1].unsqueeze(0)
-        gt_disparity = x[2]
+    def forward(self, left_image, right_image):
         left_feature = self.siamese(left_image)
         right_feature = self.siamese(right_image)
         cost = self.cost_volume((left_feature, right_feature))
         predicted_disparity = self.disparity_regression(cost)
-        return predicted_disparity, gt_disparity
+        return predicted_disparity

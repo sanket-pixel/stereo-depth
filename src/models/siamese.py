@@ -19,7 +19,7 @@ class Siamese(nn.Module):
         self.num_blocks = num_res_blocks
         self.conv1 = nn.Conv2d(self.in_channels, self.channels, kernel_size_siamese, stride=1, padding=3)
         self.bn1 = nn.BatchNorm2d(channels)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU()
         layers = list()
         layers.append(self.block(channels, kernel_size_res, stride=2, padding=1, change_dim=True))
         for i in range(1, num_res_blocks):
