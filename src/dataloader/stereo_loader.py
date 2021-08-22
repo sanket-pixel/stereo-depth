@@ -2,12 +2,13 @@ import os
 import torch
 from torch.utils.data import Dataset
 import torchvision
-from matplotlib import pyplot as plt
+from PIL import Image
 from . import dataset_utils
 import configparser
-
+from torchvision.io.image import ImageReadMode
 config = configparser.ConfigParser()
-config.read(os.path.join("configs","sceneflow.config"))
+config.read(os.path.join("configs", "kitti.config"))
+
 
 class StereoPair(Dataset):
 
@@ -27,15 +28,16 @@ class StereoPair(Dataset):
         image_pair_path = self.stereo_paths[idx]
         left_image = torchvision.io.read_image(image_pair_path[0]).float() / 255.0
         right_image = torchvision.io.read_image(image_pair_path[1]).float() / 255.0
-        disparity = dataset_utils.readPFM(image_pair_path[2])[0].unsqueeze(0)
+        disparity = Image.open(image_pair_path[2])
+        # disparity = dataset_utils.readPFM(image_pair_path[2])[0].unsqueeze(0)
         rand_h = torch.randint(0, self.H - self.h, (1,))
         rand_w = torch.randint(0, self.W - self.w, (1,))
-        left_image = self.crop_image(left_image,rand_h,rand_w)
+        left_image = self.crop_image(left_image, rand_h, rand_w)
         right_image = self.crop_image(right_image, rand_h, rand_w)
         disparity = self.crop_image(disparity, rand_h, rand_w).squeeze(0)
         left_image = self.transforms(left_image)
         right_image = self.transforms(right_image)
         return left_image, right_image, disparity
 
-    def crop_image(self,image, rand_h,rand_w):
-        return image[:,rand_h:rand_h+self.h,rand_w:rand_w+self.w]
+    def crop_image(self, image, rand_h, rand_w):
+        return image[:, rand_h:rand_h + self.h, rand_w:rand_w + self.w]

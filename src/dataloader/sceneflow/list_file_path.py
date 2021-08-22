@@ -1,5 +1,6 @@
 import os
 
+
 def get_image_pair_names(data_path):
     image_pair_list = []
     for sub_folder in os.listdir(data_path):

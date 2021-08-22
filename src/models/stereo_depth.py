@@ -4,7 +4,7 @@ import configparser
 from . import siamese, joined_processing, disparity_regression, residual_block, residual_block_3d
 
 config = configparser.ConfigParser()
-config.read("configs/sceneflow.config")
+config.read("configs/kitti.config")
 
 
 class StereoDepth(nn.Module):

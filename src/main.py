@@ -1,4 +1,5 @@
-from dataloader import list_file_path
+# from dataloader.sceneflow import list_file_path
+from dataloader.kitti import list_file_path
 from dataloader import stereo_loader
 from dataloader import transforms
 from torch.utils.data import DataLoader
@@ -9,24 +10,28 @@ from tqdm import tqdm
 import numpy as np
 
 config = configparser.ConfigParser()
-config.read("configs/sceneflow.config")
+config.read("configs/kitti.config")
 learning_rate = config.getfloat("Training", "learning_rate")
 epochs = config.getint("Training", "epochs")
 eval_freq = config.getint("Training", "eval_freq")
 save_freq = config.getint("Training", "save_freq")
 batch_size = config.getint("Training", "batch_size")
-datapath = config.get("Data", "datapath")
+datapath_training = config.get("Data", "datapath_training")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-stereo_path_list = list_file_path.get_image_pair_names(datapath)
-stereo_dataset = stereo_loader.StereoPair(stereo_path_list,
-                                          transforms=transforms.get_transforms())
+stereo_path_list_train = list_file_path.get_image_pair_names(datapath_training, mode="train")
+stereo_path_list_val = list_file_path.get_image_pair_names(datapath_training, mode="eval")
 
-dataloader_train = DataLoader(stereo_dataset, batch_size=batch_size, shuffle=True, num_workers=8)
-dataloader_validation = DataLoader(stereo_dataset, batch_size=batch_size, shuffle=True, num_workers=8)
+stereo_dataset_train = stereo_loader.StereoPair(stereo_path_list_train,
+                                                transforms=transforms.get_transforms())
+stereo_dataset_val = stereo_loader.StereoPair(stereo_path_list_val,
+                                              transforms=transforms.get_transforms())
 
+dataloader_train = DataLoader(stereo_dataset_train, batch_size=batch_size, shuffle=True, num_workers=4)
+dataloader_validation = DataLoader(stereo_dataset_val, batch_size=batch_size, shuffle=False, num_workers=4)
 
+x=stereo_dataset_train[0]
 # save model
 def save_model(model, stats, model_name):
     model_dict = {"model": model, "stats": stats}
@@ -66,8 +71,9 @@ def train():
             progress_bar.set_description(f"Epoch {0 + 1} Iter {i + 1}: loss {loss.item():.5f}. ")
 
         loss_hist.append(np.mean(loss_list))
-        stats[epoch]=epoch
+        stats[epoch] = epoch
         stats['train_loss'].append(loss_hist[-1])
+
 
 # stereo_pair = stereo_dataset[0]
 # predicted_disparity, gt_disparity = model(stereo_pair)

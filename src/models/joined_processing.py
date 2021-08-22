@@ -5,7 +5,7 @@ import configparser
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 config = configparser.ConfigParser()
-config.read("configs/sceneflow.config")
+config.read("configs/kitti.config")
 
 in_channels = config.getint("Siamese", "channels")
 

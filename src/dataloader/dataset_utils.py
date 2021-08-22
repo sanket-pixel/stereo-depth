@@ -11,7 +11,8 @@ import configparser
 import os
 
 config = configparser.ConfigParser()
-config.read(os.path.join("configs","sceneflow.config"))
+config.read(os.path.join("configs", "sceneflow.config"))
+
 
 def readPFM(file):
     file = open(file, 'rb')
@@ -44,7 +45,7 @@ def readPFM(file):
     data = np.flipud(data)
     file.close()
 
-    max_disparity = config.getint("CostVolume","max_disparity")
-    data = (data/data.max())*max_disparity
+    max_disparity = config.getint("CostVolume", "max_disparity")
+    data = (data / data.max()) * max_disparity
     data = torch.from_numpy(data.copy())
     return data, scale
