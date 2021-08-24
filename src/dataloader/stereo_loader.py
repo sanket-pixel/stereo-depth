@@ -9,15 +9,16 @@ from . import dataset_utils
 import configparser
 from torchvision.io.image import ImageReadMode
 from matplotlib import pyplot as plt
+
 config = configparser.ConfigParser()
 config.read(os.path.join("configs", "kitti.config"))
 
 
 class StereoPair(Dataset):
 
-    def __init__(self, stereo_paths, transforms):
+    def __init__(self, stereo_paths, transforms, mode):
         self.stereo_paths = stereo_paths
-        self.mode = None
+        self.mode = mode
         self.transforms = transforms
         self.H = config.getint("Data", "H")
         self.W = config.getint("Data", "W")
@@ -31,14 +32,15 @@ class StereoPair(Dataset):
         image_pair_path = self.stereo_paths[idx]
         left_image = torchvision.io.read_image(image_pair_path[0]).float() / 255.0
         right_image = torchvision.io.read_image(image_pair_path[1]).float() / 255.0
-        disparity = torch.from_numpy(np.array(Image.open(image_pair_path[2]))/256).float().unsqueeze(0)
+        disparity = torch.from_numpy(np.array(Image.open(image_pair_path[2])) / 256).float().unsqueeze(0)
         plt.imshow(disparity.squeeze(0))
         # disparity = dataset_utils.readPFM(image_pair_path[2])[0].unsqueeze(0)
-        rand_h = torch.randint(0, self.H - self.h, (1,))
-        rand_w = torch.randint(0, self.W - self.w, (1,))
-        left_image = self.crop_image(left_image, rand_h, rand_w)
-        right_image = self.crop_image(right_image, rand_h, rand_w)
-        disparity = self.crop_image(disparity, rand_h, rand_w).squeeze(0)
+        if self.mode == "train":
+            rand_h = torch.randint(0, self.H - self.h, (1,))
+            rand_w = torch.randint(0, self.W - self.w, (1,))
+            left_image = self.crop_image(left_image, rand_h, rand_w)
+            right_image = self.crop_image(right_image, rand_h, rand_w)
+            disparity = self.crop_image(disparity, rand_h, rand_w).squeeze(0)
         left_image = self.transforms(left_image)
         right_image = self.transforms(right_image)
         return left_image, right_image, disparity

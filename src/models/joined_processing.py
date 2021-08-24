@@ -44,8 +44,8 @@ class CostVolume(nn.Module):
 
     def features_to_cost_volume(self, left_feat, right_feat):
 
-        cost = torch.Tensor(self.batch_size, self.in_channels * 2, self.max_disparity // 4, self.height // 4,
-                            self.width // 4).to(device)
+        cost = torch.Tensor(self.batch_size, self.in_channels * 2, self.max_disparity // 4,  left_feat.shape[-2] ,
+                            left_feat.shape[-1]).to(device)
         for i in range(self.max_disparity // 4):
             if i == 0:
                 cost[:, :self.in_channels, i, :, :] = left_feat
