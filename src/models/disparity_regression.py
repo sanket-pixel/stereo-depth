@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-
+from matplotlib import pyplot as plt
 import configparser
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

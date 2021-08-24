@@ -2,10 +2,13 @@ import os
 import torch
 from torch.utils.data import Dataset
 import torchvision
+import cv2
+import numpy as np
 from PIL import Image
 from . import dataset_utils
 import configparser
 from torchvision.io.image import ImageReadMode
+from matplotlib import pyplot as plt
 config = configparser.ConfigParser()
 config.read(os.path.join("configs", "kitti.config"))
 
@@ -28,7 +31,8 @@ class StereoPair(Dataset):
         image_pair_path = self.stereo_paths[idx]
         left_image = torchvision.io.read_image(image_pair_path[0]).float() / 255.0
         right_image = torchvision.io.read_image(image_pair_path[1]).float() / 255.0
-        disparity = Image.open(image_pair_path[2])
+        disparity = torch.from_numpy(np.array(Image.open(image_pair_path[2]))/256).float().unsqueeze(0)
+        plt.imshow(disparity.squeeze(0))
         # disparity = dataset_utils.readPFM(image_pair_path[2])[0].unsqueeze(0)
         rand_h = torch.randint(0, self.H - self.h, (1,))
         rand_w = torch.randint(0, self.W - self.w, (1,))

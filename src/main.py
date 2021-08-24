@@ -8,7 +8,7 @@ import configparser
 import torch
 from tqdm import tqdm
 import numpy as np
-
+from torch import nn
 config = configparser.ConfigParser()
 config.read("configs/kitti.config")
 learning_rate = config.getfloat("Training", "learning_rate")
@@ -28,9 +28,8 @@ stereo_dataset_train = stereo_loader.StereoPair(stereo_path_list_train,
 stereo_dataset_val = stereo_loader.StereoPair(stereo_path_list_val,
                                               transforms=transforms.get_transforms())
 
-dataloader_train = DataLoader(stereo_dataset_train, batch_size=batch_size, shuffle=True, num_workers=4)
-dataloader_validation = DataLoader(stereo_dataset_val, batch_size=batch_size, shuffle=False, num_workers=4)
-
+dataloader_train = DataLoader(stereo_dataset_train, batch_size=batch_size, shuffle=True, num_workers=8)
+dataloader_validation = DataLoader(stereo_dataset_val, batch_size=batch_size, shuffle=False, num_workers=8)
 x=stereo_dataset_train[0]
 # save model
 def save_model(model, stats, model_name):
@@ -40,7 +39,7 @@ def save_model(model, stats, model_name):
 
 def train():
     model = stereo_depth.StereoDepth()
-    model = model.to(device)
+    model =nn.DataParallel(model).to(device)
     criterion = torch.nn.SmoothL1Loss()
     optimizer = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
     torch.autograd.set_detect_anomaly(True)
