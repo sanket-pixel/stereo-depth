@@ -8,7 +8,6 @@ from PIL import Image
 from . import dataset_utils
 import configparser
 from torchvision.io.image import ImageReadMode
-from matplotlib import pyplot as plt
 
 config = configparser.ConfigParser()
 config.read(os.path.join("configs", "kitti.config"))
@@ -31,9 +30,10 @@ class StereoPair(Dataset):
     def __getitem__(self, idx):
         image_pair_path = self.stereo_paths[idx]
         left_image = torchvision.io.read_image(image_pair_path[0]).float() / 255.0
+        l= left_image
         right_image = torchvision.io.read_image(image_pair_path[1]).float() / 255.0
+        r = right_image
         disparity = torch.from_numpy(np.array(Image.open(image_pair_path[2])) / 256).float().unsqueeze(0)
-        plt.imshow(disparity.squeeze(0))
         # disparity = dataset_utils.readPFM(image_pair_path[2])[0].unsqueeze(0)
         if self.mode == "train":
             rand_h = torch.randint(0, self.H - self.h, (1,))
@@ -43,6 +43,8 @@ class StereoPair(Dataset):
             disparity = self.crop_image(disparity, rand_h, rand_w).squeeze(0)
         left_image = self.transforms(left_image)
         right_image = self.transforms(right_image)
+        if self.mode=="eval":
+            return left_image,right_image,disparity,l,r
         return left_image, right_image, disparity
 
     def crop_image(self, image, rand_h, rand_w):
