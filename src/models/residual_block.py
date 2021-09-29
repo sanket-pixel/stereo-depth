@@ -33,7 +33,8 @@ class ResidualBlock(nn.Module):
         if self.change_dim:
             identity = self.bn1(self.conv1x1_1(identity))
             identity = self.bn2(self.conv1x1_2(identity))
-        x += identity
+
+        x += identity # add input to the output in accordance to residual network logic
         x = self.relu(x)
 
         return x

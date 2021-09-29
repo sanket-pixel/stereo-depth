@@ -4,6 +4,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read("configs/kitti.config")
 
+# read architecture config for siamese
 in_channels = config.getint("Siamese", "in_channels")
 channels = config.getint("Siamese", "channels")
 channels2d = [int(c) for c in config.get("Siamese", "channels2d")[1:-1].split(",")]
@@ -23,7 +24,7 @@ class Siamese(nn.Module):
         self.bn1 = nn.BatchNorm2d(self.channels)
         self.relu = nn.ReLU()
         layers = list()
-        # layers.append(self.block(in_channels, channels2d[0], kernel_size_res, stride=2, padding=1, change_dim=True))
+        # make residual block list
         for i in range(0, num_res_blocks):
             layers.append(self.block(channels2d[i], channels2d[i+1], kernel_size_res, stride=stride2d[i], padding=1, change_dim=True))
         self.residual_sequence = nn.Sequential(*layers)

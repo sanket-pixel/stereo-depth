@@ -39,11 +39,11 @@ class CostVolume(nn.Module):
     def forward(self, x):
         left_feat, right_feat = x
         cost = self.features_to_cost_volume(left_feat, right_feat)
-        processed_volume = self.process_volume(cost)
+        processed_volume = self.process_volume(cost) # apply 3D resnet on the cost volume
         return processed_volume
 
     def features_to_cost_volume(self, left_feat, right_feat):
-
+        # concat left and right feature maps into a cost volume
         cost = torch.Tensor(self.batch_size, self.in_channels * 2, self.max_disparity // 4,  left_feat.shape[-2] ,
                             left_feat.shape[-1]).to(device)
         for i in range(self.max_disparity // 4):

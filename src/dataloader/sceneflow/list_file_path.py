@@ -1,7 +1,7 @@
 import os
 
-
 def get_image_pair_names(data_path):
+    # reads names of left and right image pairs
     image_pair_list = []
     for sub_folder in os.listdir(data_path):
         data_path_1 = os.path.join(data_path, sub_folder, "disparity")

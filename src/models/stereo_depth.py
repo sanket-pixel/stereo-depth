@@ -17,8 +17,8 @@ class StereoDepth(nn.Module):
         self.disparity_regression = disparity_regression.SoftRegression()
 
     def forward(self, left_image, right_image):
-        left_feature = self.siamese(left_image)
-        right_feature = self.siamese(right_image)
-        cost = self.cost_volume((left_feature, right_feature))
-        predicted_disparity = self.disparity_regression(cost)
+        left_feature = self.siamese(left_image) # process left image through siamese
+        right_feature = self.siamese(right_image) #process right image through siamese
+        cost = self.cost_volume((left_feature, right_feature)) # concat them into a 3D cost volume and process it
+        predicted_disparity = self.disparity_regression(cost) # apply soft regression
         return predicted_disparity

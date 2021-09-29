@@ -34,6 +34,6 @@ class ResidualBlock3D(nn.Module):
         if self.change_dim:
             identity = self.bn1(self.conv1x1x1(identity))
 
-        x += identity
+        x += identity # add input to output of 3D residual network
         x = self.relu(x)
         return x

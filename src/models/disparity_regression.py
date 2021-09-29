@@ -19,13 +19,13 @@ class SoftRegression(nn.Module):
         self.scale_factor = scale_factor
         self.mode = mode
         self.max_disparity = max_disparity
-        self.upsample = nn.Upsample(scale_factor=self.scale_factor, mode=self.mode)
-        self.channelwise_softmax = nn.Softmax(dim=1)
-        self.disparity_values = torch.arange(self.max_disparity).float().to(device)
+        self.upsample = nn.Upsample(scale_factor=self.scale_factor, mode=self.mode) # upsampling to match image size
+        self.channelwise_softmax = nn.Softmax(dim=1) # apply channelwise softmax
+        self.disparity_values = torch.arange(self.max_disparity).float().to(device) # define disparity values
 
     def forward(self, x):
-        x = self.upsample(x)
+        x = self.upsample(x) # upsample
         x = x.squeeze(1)
-        x = self.channelwise_softmax(x)
-        x = torch.tensordot(x, self.disparity_values.float(), [[1], [0]])
+        x = self.channelwise_softmax(x) # channelwise softmax
+        x = torch.tensordot(x, self.disparity_values.float(), [[1], [0]]) #take weighted average for soft regression
         return x
